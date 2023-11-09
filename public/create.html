@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
+<style>
+  body{
+    background-color: lightblue;
+  }
+  .container{
+    margin: 1in;
+  }
+
+  .fancy-button {
+        background-color: red;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 18px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease;
+    }
+
+    .fancy-button:hover {
+        background-color: #ff4444;
+        cursor: pointer;
+    }
+</style>
+
+<body id = "app">  
+  <!-- <form class="container" style = "color: black"> -->
+    <!-- <form class="container" style="color: black" action="/bookings" method="POST" id = "app"> -->
+    <form class="container my-5" @submit.prevent="submitBooking">
+    <div class="row mb-3">
+      <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+      <div class="col-sm-10">
+        <input type="email" class="form-control" id="inputEmail3" v-model="booking.email" required>
+        <!-- <input class="input is-danger" type="email" placeholder="Email input" name="email"> -->
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="inputPassword3" class="col-sm-2 col-form-label">Number of Tickets</label>
+      <div class="col-sm-10">
+        <input type="number" class="form-control" id="inputPassword3" v-model="booking.numTickets" min=1 max=4>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Favorite Team</label>
+      <select class="form-select" v-model = "booking.team" aria-label="Default select example" onchange="teamSelected(this.value)" >
+        <option selected>Open this select menu</option>
+        <option value="Avengers">Avengers</option>
+        <option value="JLA">Justice League</option>
+      </select>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Favorite Hero</label>
+      <select class="form-select" aria-label="Default select example" id="superhero"  v-model = "booking.superhero" disabled>
+      </select>
+    </div>
+
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-2 pt-0">Payment Method</legend>
+      <div class="col-sm-10">
+        <div class="form-check" v-model="booking.payment">
+            <input class="form-check-input" type="radio" v-model="booking.payment" id="gridRadios1" name="paymentMethod" value="Credit Card" checked>
+            <label class="form-check-label" for="gridRadios1">
+              Pay with Credit Card
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" v-model="booking.payment" id="gridRadios2" name="paymentMethod" value="Paypal">
+            <label class="form-check-label" for="gridRadios2">
+              Pay with Paypal
+            </label>
+          </div>
+          <div class="form-check disabled">
+            <input class="form-check-input" type="radio" v-model="booking.payment" id="gridRadios3" name="paymentMethod" value="Octopus" disabled>
+            <label class="form-check-label" for="gridRadios3">
+              Pay with Octopus
+            </label>
+          </div>
+      </div>
+    </fieldset>
+    <div class="row mb-3">
+      <label for="inputDisabled" class="col-sm-2 col-form-label">Disabled Input</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="inputDisabled" placeholder="This input is disabled" disabled>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-sm-10 offset-sm-2">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="gridCheck1"  v-model = "booking.terms">
+          <label class="form-check-label" for="gridCheck1">
+            Agree to terms and conditions
+          </label>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary fancy-button">Buy Tickets</button>
+  </form>
+  <script type="module">
+    import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    createApp({
+        data() {
+            return {
+                // your data properties here
+                booking: {
+                    email: '',
+                    numTickets: 0,
+                    team: '',
+                    superhero: '',
+                    payment: '',
+                    terms: false
+                }
+            };
+        },
+        methods: {
+            // post the booking to the backend
+            async submitBooking() {
+                // post the booking to the backend
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.booking)
+                    
+                });
+
+                // convert the response to JSON
+                const json = await response.json();
+
+                // log the JSON
+                console.log(json);
+
+                // alert the user
+                alert(JSON.stringify(json));
+            }
+        }
+    }).mount('#app');
+</script>
+<script>
+    const avengers = ['Iron Man', 'Captain America', 'Thor', 'Hulk', 'Black Widow', 'Hawkeye'];
+    const justiceLeague = ['Superman', 'Batman', 'Wonder Woman', 'Flash', 'Aquaman', 'Cyborg'];
+
+    function teamSelected(team) {
+      var superheroElem = document.getElementById("superhero");
+      superheroElem.options.length = 0;
+
+      if (team == "Avengers") {
+        for (var hero of avengers) {
+          var option = document.createElement("option");
+          option.text = hero;
+         option.value = hero;
+          superheroElem.add(option);
+        }
+
+        superheroElem.disabled = false;
+      } else if (team == "JLA") {
+        for (var hero of justiceLeague) {
+          var option = document.createElement("option");
+          option.text = hero;
+          option.value = hero;
+          superheroElem.add(option);
+        }
+
+        superheroElem.disabled = false;
+      } else {
+        superheroElem.disabled = true;
+      }
+    }
+  </script>
+ 
+</html>

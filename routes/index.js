@@ -137,6 +137,24 @@ router.get('/bookings/search', async function (req, res) {
 
 //paginate
 
+// router.get('/bookings/paginate', async function (req, res) {
+//   const db = await connectToDB();
+//   try {
+//     let page = parseInt(req.query.page) || 1;
+//     let perPage = parseInt(req.query.perPage) || 10;
+//     let skip = (page - 1) * perPage;
+
+//     let result = await db.collection("bookings").find().skip(skip).limit(perPage).toArray();
+//     let total = await db.collection("bookings").countDocuments();
+
+//     res.render('bookings', { bookings: result, total: total, page: page, perPage: perPage });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+//   finally {
+//     await db.client.close();
+//   }
+// });
 router.get('/bookings/paginate', async function (req, res) {
   const db = await connectToDB();
   try {
@@ -147,11 +165,10 @@ router.get('/bookings/paginate', async function (req, res) {
     let result = await db.collection("bookings").find().skip(skip).limit(perPage).toArray();
     let total = await db.collection("bookings").countDocuments();
 
-    res.render('bookings', { bookings: result, total: total, page: page, perPage: perPage });
+    res.render('paginate', { bookings: result, total: total, page: page, perPage: perPage });
   } catch (err) {
     res.status(400).json({ message: err.message });
-  }
-  finally {
+  } finally {
     await db.client.close();
   }
 });
